@@ -1,0 +1,4 @@
+{
+  "default_log_level": "INFO",
+  "log_file_path": "logs/cdc-service.json"
+}
