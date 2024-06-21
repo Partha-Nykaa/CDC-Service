@@ -3,6 +3,7 @@ setuptools==65.5.1
 confluent_kafka==2.4.0
 # dont upgrade flask
 #Flask==2.1.2
+pytest==7.0.1
 python-json-logger==2.0.4
 requests==2.31.0
 PyHamcrest==2.0.4

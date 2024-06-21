@@ -1,5 +1,3 @@
-import time
-
 from kafka_connector import KafkaConnectorFactoryImpl
 class TestKafkaConnection:
     def __init__(self, config):

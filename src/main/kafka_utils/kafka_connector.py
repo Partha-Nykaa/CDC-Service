@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from confluent_kafka import Producer, Consumer, KafkaException
+
 
 class KafkaConnectorFactory(ABC):
     @abstractmethod

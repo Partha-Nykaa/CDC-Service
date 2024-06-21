@@ -4,8 +4,6 @@ import json
 import os
 import sys
 
-from flask import Flask
-
 sys.path.append(os.getcwd() + '/src')
 
 from main.common.nykaa_logger_factory import RootLoggerFactory, ActivityLoggerFactory
@@ -16,26 +14,26 @@ flask = None
 RootLoggerFactory().setup()
 
 
-def job(cfp) -> (str, Flask):
+def cdc(cfp) -> (str):
     from main import __main__
     with open(cfp) as json_file:
         config = json.load(json_file)
-        return __main__.start_celery(config)
+        #return __main__.start_celery(config)
+        #TODO start the kafka and cdc pipeline
 
 
-def application(cfp) -> (str, Flask):
+def application(cfp) -> (str):
     from main import __main__
     ActivityLoggerFactory().setup()
     with open(cfp) as json_file:
         config = json.load(json_file)
-        d = True
-        f = __main__.start_flask(config)
+        d = False
 
-    return d, f
+    return d
 
 
 def run_tests(test_dir, feature_file_name):
-    from behave import __main__
+    from pytest import __main__
     if feature_file_name == 'all':
         test_command = test_dir
     else:
@@ -68,15 +66,12 @@ def cli_parser():
                                 help="Enabled code coverage. Valid for tests only.")
 
     group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument('-m', '--main', action='store', nargs=1, dest='main',
-                       help='Run main server with given environment', metavar='config_path')
-    group.add_argument('-j', '--job', action='store', nargs=1, dest='job',
-                       help='Run job server with given environment', metavar='config_path')
+    group.add_argument('-f', '--feed', action='store', nargs=1, dest='feed',
+                       help='Run feed server with given environment', metavar='config_path')
+    group.add_argument('-c', '--cdc', action='store', nargs=1, dest='cdc',
+                       help='Run cdc server with given environment', metavar='config_path')
     group.add_argument('-u', '--unit', action='store', nargs=1, dest='unit',
                        help='Run a single or all unit test feature(s)', metavar='<feature_file_name> | all')
-    group.add_argument('-i', '--integration', action='store', nargs=2, dest='integration',
-                       help='Run a single or all unit test feature(s)',
-                       metavar=('<feature_file_name> | all', 'config_path'))
     group.add_argument('-t', '--test', action='store', nargs=1, dest='test',
                        help='Run a single or all unit test feature(s)',
                        metavar='config_path')
@@ -90,14 +85,13 @@ def cli_controller():
 
     parser = cli_parser()
     args = parser.parse_args()
-    global debug, flask
+    global debug
 
     enabled_coverage = args.cov_arg
 
-    if args.main:
+    if args.feed:
         config_file_path = args.main[0]
-        debug, flask = application(config_file_path)
-        flask.run(debug=debug, threaded=True, port=5500)
+        debug = application(config_file_path)
 
     if args.unit:
         feature_name = args.unit[0]
@@ -133,13 +127,13 @@ def cli_controller():
         else:
             run_it_ut(None, None)
 
-    if args.job:
-        config_file_path = args.job[0]
-        job(config_file_path)
+    if args.cdc:
+        config_file_path = args.cdc[0]
+        cdc(config_file_path)
 
     if not (args.unit or args.main or args.integration or args.test or args.job):
         config_file_path = os.environ[config_file_path_name]
-        debug, flask = application(config_file_path)
+        debug = application(config_file_path)
 
 
 cli_controller()
