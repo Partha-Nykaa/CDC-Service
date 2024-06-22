@@ -30,6 +30,7 @@ class KafkaConnector:
 
     def consume_message(self, topics,timeout=1.0):
         self.consumer.subscribe(topics)
+        print(timeout)
         try:
             msg = self.consumer.poll(timeout)
             if msg is None:

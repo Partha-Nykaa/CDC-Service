@@ -1,11 +1,11 @@
 from kafka_connector import KafkaConnectorFactoryImpl
-class TestKafkaConnection:
+class KafkaConnection:
     def __init__(self, config):
         factory = KafkaConnectorFactoryImpl()
         self.kafka_connector = factory.create_kafka_connector(config)
         print ("Kafka connection successful")
 
-    def test_connection(self):
+    def connection(self):
         # Define a test topic, key, and value
         test_topic = 'feed-topic-normal'
         test_key = 'test_key'
@@ -40,5 +40,5 @@ config = {
     'auto.offset.reset': 'earliest',
 }
 
-test = TestKafkaConnection(config)
-test.test_connection()
+test = KafkaConnection(config)
+test.connection()
